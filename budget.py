@@ -1,10 +1,10 @@
-class Category:
-    def __init__(self, name):
-        if len(name) > 30:
-            raise ValueError("Category name should not exceed 30 characters")
+from typing import List, Dict
+from pydantic import BaseModel, PositiveFloat
+from pydantic import validate_call
 
-        self.name = name
-        self.ledger = list()
+class Category(BaseModel):
+    name: str
+    ledger: List[Dict[str, object]] = list()
     
     
     def __str__(self):
@@ -23,32 +23,21 @@ class Category:
         return title_line + transactions_str + category_total
 
 
-    def deposit(self, amount, description = ""):
-        if not isinstance(amount, (int, float)):
-            raise TypeError("The 'amount' argument should be numeric")
-        if not isinstance(description, str):
-            raise TypeError("The 'description' argument should be a string")
-        if amount <= 0:
-            raise ValueError("Invalid deposit amount")
+    @validate_call
+    def deposit(self, amount: PositiveFloat, description: str = ""):
         
         self.ledger.append({"amount": amount, "description":description})
     
     def get_balance(self):
         return sum(transaction["amount"] for transaction in self.ledger) if len(self.ledger) > 0 else 0
     
-    def check_funds(self, amount):
-        if not isinstance(amount, (int, float)):
-            raise TypeError("The 'amount' argument should be numeric")
+    @validate_call
+    def check_funds(self, amount: PositiveFloat):
         
-        return True if amount <= self.get_balance() else False
+        return bool(amount <= self.get_balance())
     
-    def withdraw(self, amount, description = ""):
-        if not isinstance(amount, (int, float)):
-            raise TypeError("The 'amount' argument should be numeric")
-        if not isinstance(description, str):
-            raise TypeError("The 'description' argument should be a string")
-        if amount <= 0:
-            raise ValueError("Invalid withdrawal amount")
+    @validate_call
+    def withdraw(self, amount: PositiveFloat, description: str = ""):
         
         if self.check_funds(amount) is False: return False
         
@@ -57,13 +46,10 @@ class Category:
 
         return True
     
-    def transfer(self, amount, destination_category):
-        if not isinstance(amount, (int, float)):
-            raise TypeError("The 'amount' argument should be of type int or float")
+    @validate_call
+    def transfer(self, amount: PositiveFloat, destination_category):
         if not isinstance(destination_category, Category):
             raise TypeError("The 'destination_category' argument should be of type Category")
-        if amount <= 0:
-            raise ValueError("Invalid transfer amount")
         
         if self.check_funds(amount) is False: return False
 
@@ -73,11 +59,9 @@ class Category:
         return True
 
 
-def create_spend_chart(categories):
-    if not isinstance(categories, list):
-        raise TypeError("The argument 'categories' should be of type list")
-
-
+@validate_call
+def create_spend_chart(categories: list):
+    
     # Compute the expenses per category and the total expenditure
     category_expenses = dict()
     total_expenditure = float()
