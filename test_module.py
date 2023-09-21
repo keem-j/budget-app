@@ -6,9 +6,9 @@ from budget import create_spend_chart
 class UnitTests(unittest.TestCase):
     maxDiff = None
     def setUp(self):
-        self.food = budget.Category("Food")
-        self.entertainment = budget.Category("Entertainment")
-        self.business = budget.Category("Business")
+        self.food = budget.Category(name = "Food")
+        self.entertainment = budget.Category(name = "Entertainment")
+        self.business = budget.Category(name = "Business")
 
     def test_deposit(self):
         self.food.deposit(900, "deposit")
