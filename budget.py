@@ -28,16 +28,16 @@ class Category(BaseModel):
         
         self.ledger.append({"amount": amount, "description":description})
     
-    def get_balance(self):
+    def get_balance(self) -> float:
         return sum(transaction["amount"] for transaction in self.ledger) if len(self.ledger) > 0 else 0
     
     @validate_call
-    def check_funds(self, amount: PositiveFloat):
+    def check_funds(self, amount: PositiveFloat) -> bool:
         
         return bool(amount <= self.get_balance())
     
     @validate_call
-    def withdraw(self, amount: PositiveFloat, description: str = ""):
+    def withdraw(self, amount: PositiveFloat, description: str = "") -> bool:
         
         if self.check_funds(amount) is False: return False
         
@@ -47,7 +47,7 @@ class Category(BaseModel):
         return True
     
     @validate_call
-    def transfer(self, amount: PositiveFloat, destination_category):
+    def transfer(self, amount: PositiveFloat, destination_category) -> bool:
         if not isinstance(destination_category, Category):
             raise TypeError("The 'destination_category' argument should be of type Category")
         
@@ -60,7 +60,7 @@ class Category(BaseModel):
 
 
 @validate_call
-def create_spend_chart(categories: list):
+def create_spend_chart(categories: list) -> str:
     
     # Compute the expenses per category and the total expenditure
     category_expenses = dict()
